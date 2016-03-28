@@ -1,0 +1,8 @@
+MIDlet-Name: CascadaOfflinePOS
+MIDlet-Version: 3.4.0
+MIDlet-Vendor: IpxServer
+MIDlet-Jar-URL: CascadaOfflinePOS.jar
+MIDlet-Jar-Size: 3245310
+MIDlet-Description: A localized sample project
+MIDlet-Info-URL: http://localhost
+MIDlet-1: CascadaPOS,/icon.png,com.mobiwire.startup.StartApp

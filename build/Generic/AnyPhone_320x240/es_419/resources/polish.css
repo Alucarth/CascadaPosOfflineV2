@@ -1,0 +1,397 @@
+colors {
+	bgColor: white;
+	highlightedBgColor: #2ebaeb;
+	titleColor: #ffffff;
+	titleShadowColor: #2ebaeb;
+	screenBgColor: white;
+	screenBgBottomColor: #99f;
+	fontColor: white;
+	focusedFontColor: white;
+	inactiveFontColor: white;
+	menubarColor: #6262d4;
+	activeTabColor: #7272f4; 
+	inactiveTabColor: #2ebaeb;
+	/* the color which is used for overlays when a screen defines the repaint-previous-screen CSS attribute: */
+	overlay: argb( 150, 0, 0, 0 );
+}
+
+focused {
+	padding: 2;
+	layout: expand | left;
+	font-color: focusedFontColor;
+	font-style: bold;
+	background-color: highlightedBgColor;
+        background-type:round-rect;
+	label-style: .labelFocused;	
+}
+.focusedTable
+{
+	padding: 2;
+	layout: expand | center;
+	font-color: focusedFontColor;
+	font-style: bold;
+	background-color: highlightedBgColor;
+        background-type:round-rect;
+	label-style: .labelFocused;		
+
+}
+title {
+	padding-top: 6;
+	padding-bottom: 6;
+        background-color: #0087cb;
+        background-type:round-rect;
+	font-color: titleColor;
+        font-style: bold;
+	layout: expand | center;	
+}
+list{
+    background-color: white;
+    font-color:#013e7d;
+}
+listItem{
+    font-color:#013e7d;
+}
+
+radiobox{
+    box-align:left;
+    font-color:white;
+    choice-color:black;
+    layout:expand;
+}
+ticker{
+    font-color:red;
+    font-style:bold;
+    ticker-position:bottom;
+}
+form {
+    font-color:white;
+    background {
+        color: white;
+        
+    }
+ 
+    
+}
+p{
+    font-color:#013e7d;
+    layout:center;
+    label-style:stringLabel;
+}
+.voucherType extends p{
+    layout:left|expand;
+    margin-top :3;
+    label-style : voucherLabel;
+    font-size:small;
+    font-style:bold;
+}
+.voucherLabel{
+    width: 50%;
+    font-color:white;
+    
+}
+.stringLabel{
+    layout:center;
+    font-color:#013e7d;
+    font-style:bold;
+}
+.solidTitle extends title {
+	background-color: white;
+}
+
+label {
+	padding: 1;
+	font-style: bold;
+        font-color:#013e7d;
+	layout: left;
+        
+}
+
+.labelFocused extends label {
+	font-color: fontColor;
+}
+
+
+textfield {
+	label-style: inputLabel;
+	padding: 1px;
+	margin: 1px;
+	background-color: #e5e5e5;
+        background-type:round-rect;
+	font-color: black;
+        text-wrap: false;
+	layout: hexpand | left;
+        border {
+                type:round-rect;
+		color: #58585a;
+		width: 1;
+	}
+}
+
+textfield:hover {
+	margin: 1px;
+        padding: 1px;
+	font-color:black;
+	background-color: white;
+	border {
+                type:round-rect;
+		color: black;
+		width: 1;
+	}
+}
+
+.inputLabel{
+	width: 50%;
+        font-color:#013e7d;
+}
+
+info {
+	margin-right: 5;
+	font-size: small;
+	layout: right;
+	background-color: #e5e5e5;
+}
+screeninfo {
+	margin-top: -24;
+	margin-left: 10;
+}
+
+menu {
+	margin-top: 24;
+	/* background-color: argb( 200, 255, 255, 255 ); */
+	background-color: white;
+        background-type:round-rect;
+        menubar-color:#2ebaeb;
+	min-width: 120;
+	font-style : bold;	
+	font-color: white;	
+        border {
+                type:round-rect;
+		color: black;
+		width: 1;
+	}
+
+}
+
+menu1 extends menu {
+	margin-bottom: 1;
+	border-color: black;
+}
+
+
+menuitem {
+	padding: 2;
+	font-style: plain;
+	font-color: black;	
+        background-color: white;
+	/*
+	command-child-indicator: url( arrowR.png );
+	*/
+	command-child-indicator-width: 4;
+	command-child-indicator-height: 4;
+}
+
+menubar {
+	background-color: white;
+        font-color:black;
+	min-width: 120;
+}
+
+leftcommand extends menuitem {
+}
+
+rightcommand extends leftcommand {
+	layout: right;
+}
+
+.notificationAlert {
+	padding: 3;
+	layout: h-shrink | v-shrink | h-center | v-center; /* bottom; */
+	background {
+		type: round-rect;
+		color: yellow;
+		border-color: titleColor;
+		border-width: 2;
+	}
+	repaint-previous-screen: true;
+}
+
+alertText {
+	font-color: inactiveFontColor;
+	font-size: small;
+	font-style: bold;	
+}
+
+.textFieldSymbolList {
+	padding: 3;
+	margin-left: 3;
+	margin-right: 3;
+	layout: horizontal-shrink | vertical-shrink | horizontal-center | bottom;
+	columns: 4;
+	columns-width: equal;
+	repaint-previous-screen: true;
+	focused-style: .textFieldSymbolFocused;s
+	background {
+		type: round-rect;
+		color: rgb( 220, 220, 220 );
+		border-color: titleColor;
+		border-width: 2;
+	}
+}
+
+.textFieldSymbolItem {
+	layout: expand | center;
+	font-color: #013e7d;
+	font-style: bold;
+}
+
+.textFieldSymbolFocused extends .textFieldSymbolItem {
+	font-color: black;
+	background-color: yellow;
+}
+
+/*David*/
+.defaultTable {
+	padding: 3;
+	padding-horizontal: 6;
+	font-color: #3849E2;
+	font-size: small;
+	table-line-color:blue;
+	scroll-mode:normal;
+	layout: center;
+	background {
+		type: round-rect;
+		color: #dfdfaa;
+	}
+
+	
+}
+
+.defaultTable:hover {
+	padding: 3;
+	padding-vertical: 3;
+	focused-style:focusedTable;
+
+	border {
+		type: round-rect;
+		width: 1;
+		color: #1D1757;
+	}
+}
+
+
+.heading {
+	font-color: #0F3182;
+	font-style: bold;
+	font-size: small;
+	layout: center;
+}
+.bodys {
+	font-color: #4F61DF;
+	
+	font-size: small;
+	layout: center;
+}
+
+
+.centeredCell {
+	padding: 0;
+	font-color: #4F61DF;
+	font-size: small;
+	layout: center;
+}
+/*alert*/
+.mailForm {
+	padding: 5;
+	padding-left: 5;
+	padding-right: 5;
+	background-color: black;
+	layout: horizontal-expand | horizontal-center | top;
+	//#if !polish.useScrollBar
+		scrollindicator-up-image: url( arrowUp.png );
+		scrollindicator-down-image: url( arrowDown.png );
+	//#endif
+	//#if polish.midp2
+		screen-change-animation: none;
+	//#endif
+	//#if polish.api.mmapi
+		title-style: .mailFormTitle;
+	//#endif
+}
+
+.mailAlert extends .mailForm {
+	title-style: fixTitle;
+	margin-right: 10;
+	margin-left: 10;
+	padding-left: 5;
+	padding-right: 5;
+	
+	layout: horizontal-center | vertical-center | horizontal-shrink | vertical-shrink;
+	
+	repaint-previous-screen: true;
+	
+	//#if polish.midp2 || polish.api.nokia-ui
+		border {
+			type: round-rect;
+			width: 1;
+			color: black;
+			orientation: top;
+		}
+	//#endif
+	//#if polish.midp2
+		screen-change-animation: none;
+	//#endif
+	background-color: white;
+	
+}
+
+alertcontent {
+	font-color: #2ebaeb;
+}
+.busyIndicator {
+    view-type: gauge-cycling-icons;
+    layout:center;
+
+    gauge-cycling-icons-image: url( punto3.png );
+    gauge-cycling-icons-highlight-image: url( punto2.png );
+    gauge-cycling-icons-highlight-center-image: url( punto.png );
+    gauge-cycling-icons-count: 8;
+    gauge-cycling-icons-highlight-count: 3;
+  
+	
+}
+.fixTitle {
+	inherit: false;
+	font-style: bold;
+	font-color:#013e7d;
+	padding-top: 6;
+	padding-bottom: 6;
+	layout: top;
+
+}
+
+.gaugeItem {
+margin: 0;
+margin-right: 10;
+padding-left: 16;
+
+font-size: small;
+/*font-color: fontColor;*/
+font-color: fontColor;
+gauge-background-color: #71A2FB;
+layout: left | expand;
+/*gauge-width: 60; delimita el width del guage*/
+gauge-mode: continuous;
+/*gauge-mode: chunked;*/
+
+gauge-color: #11558C;
+gauge-gap-color: #13715E;
+gauge-value-align: right;
+gauge-show-value: true;
+border {
+		type: round-rect;
+		width: 1;
+		color: #1D1757;
+	}
+}
+
+

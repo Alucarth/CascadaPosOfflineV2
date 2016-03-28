@@ -1,0 +1,15 @@
+D:\CascadaPosOffline Best Network\lib\kxml2-2.3.0.jar=4
+D:\CascadaPosOffline Best Network\lib\microlog-logger-core-2.3.5.jar=2
+D:\CascadaPosOffline Best Network\lib\microlog-logger-midp-2.3.5.jar=5
+D:\CascadaPosOffline Best Network\lib\microlog-logger-midp-file-2.3.5.jar=3
+D:\CascadaPosOffline Best Network\lib\netbeans_midp_components_basic.jar=1
+D:\CascadaPosOffline v 9.8.0 beta\lib\kxml2-2.3.0.jar=14
+D:\CascadaPosOffline v 9.8.0 beta\lib\microlog-logger-core-2.3.5.jar=12
+D:\CascadaPosOffline v 9.8.0 beta\lib\microlog-logger-midp-2.3.5.jar=15
+D:\CascadaPosOffline v 9.8.0 beta\lib\microlog-logger-midp-file-2.3.5.jar=13
+D:\CascadaPosOffline v 9.8.0 beta\lib\netbeans_midp_components_basic.jar=11
+H:\CascadaPosOffline\lib\kxml2-2.3.0.jar=9
+H:\CascadaPosOffline\lib\microlog-logger-core-2.3.5.jar=7
+H:\CascadaPosOffline\lib\microlog-logger-midp-2.3.5.jar=10
+H:\CascadaPosOffline\lib\microlog-logger-midp-file-2.3.5.jar=8
+H:\CascadaPosOffline\lib\netbeans_midp_components_basic.jar=6
