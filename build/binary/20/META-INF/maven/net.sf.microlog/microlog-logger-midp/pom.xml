@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>microlog</artifactId>
+		<groupId>net.sf.microlog</groupId>
+		<version>2.3.5</version>
+	</parent>
+
+	<groupId>net.sf.microlog</groupId>
+	<artifactId>microlog-logger-midp</artifactId>
+	<name>Microlog MIDP</name>
+	<description>The Microlog MIDP module contains the MIDP specific classes</description>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>microlog-logger-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.microemu</groupId>
+			<artifactId>cldcapi11</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.microemu</groupId>
+			<artifactId>midpapi20</artifactId>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.3</source>
+					<target>1.1</target>
+					<compilerArguments>
+						<bootclasspath>
+							${settings.localRepository}/org/microemu/cldcapi11/${me2Version}/cldcapi11-${me2Version}.jar${path.separator}${settings.localRepository}/org/microemu/midpapi20/${me2Version}/midpapi20-${me2Version}.jar
+						</bootclasspath>
+					</compilerArguments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

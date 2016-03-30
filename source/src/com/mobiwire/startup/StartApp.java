@@ -344,8 +344,8 @@ public class StartApp extends MIDlet implements CommandListener {
     private Image image22;
     private Image image17;
     private Image image18;
-    private Image image19;
     private Ticker ticker;
+    private Image image19;
     private Image image20;
     private Image image14;
     private Image image15;
@@ -769,17 +769,11 @@ exitMIDlet();//GEN-LINE:|7-commandAction|2|1312-postAction
     if (command == okCommand16) {//GEN-END:|7-commandAction|11|1337-preAction
  // write pre-action user code here
 //        **************************************************************************************************************
-        
-        pantalla = CANTPROD;
+               
                 if (estaVacio(txtP) && estaVacio(txtU))
                 {
                     
-//                    switchDisplayable(getProblemas(),getFormCant());
-                      
-    //                    
-                    pantalla = CANTPROD;
-//                   txtP.setText("1");
-                   switchDisplayable(getProblemas(), getFormCant());
+                    getAlerta("Sin producto", "Por favor ingrese la cantidad del producto");
                 }
                 else
                 {
@@ -787,7 +781,8 @@ exitMIDlet();//GEN-LINE:|7-commandAction|2|1312-postAction
 switchDisplayable (null, getListProductos ());//GEN-BEGIN:|7-commandAction|12|1337-postAction
 //GEN-END:|7-commandAction|12|1337-postAction
           */    
-                cambiarPantalla();
+//                cambiarPantalla();
+                switchDisplayable (null, getListProductos ());  
                 Products productoSeleccionado =(Products) cuenta.getProductos().elementAt(puntero);
                 Products pro = new Products();
                 pro.setId(productoSeleccionado.getId());
@@ -806,41 +801,51 @@ switchDisplayable (null, getListProductos ());//GEN-BEGIN:|7-commandAction|12|13
 //                    txtP.setText("0");
 //                }
 //                if(txtU.getString())
-                int p=0;
-                if(!txtP.getString().equals(""))
+                
+                 switch(product_state)
                 {
-                    p=Integer.parseInt(txtP.getString());
+                    case PAQUETE:
+                        int p=0;
+                        if(!txtP.getString().equals(""))
+                        {
+                            p=Integer.parseInt(txtP.getString());
+                            pro.setQty(p+"");
+                            pro.setPaquete(p+"");
+                            pro.setUnidad("0");
+                        }
+                        break;
+                    case UNIDAD:
+                          int u=0;
+                          
+                        if(!txtU.getString().equals(""))
+                        {
+                           u=Integer.parseInt(txtU.getString());
+                        }
+                        pro.setQty(u+"");
+                        pro.setPaquete("0");
+                        pro.setUnidad(u+"");
+                        break;
+                    case SINPRODUCTO:
+                            switchDisplayable(null, getListMenu());
+                        break;
+                    default: switchDisplayable(null, getListMenu());            
                 }
-                int u=0;      
-                if(!txtU.getString().equals(""))
-                {
-                   u=Integer.parseInt(txtU.getString());
-                }
-                int c;
-                c=(int)(p* Integer.parseInt(pro.getUnits()))+u;
-//                aux = c;
-//                double p = Integer.parseInt(pro.getUnits());
-//                pro.setQty((Integer.parseInt(txtP.getString())*Integer.parseInt(pro.getUnits()))+"");
-//                pro.setQty(txtP.getString()+"");
                 
                  if(!txtB.getString().equals(""))
                  {
                    pro.setBoni(txtB.getString());
-                   c=c+Integer.parseInt(txtB.getString());
                  }
 //              
                  if(!txtD.getString().equals(""))
                  {
                      pro.setDesc(txtD.getString().replace(',', '.'));
                  }
-                 pro.setQty(c+"");
-                 pro.setPaquete(p+"");
-                 pro.setUnidad(u+"");
-                  listProductos.append(pro.getKey()+" "+pro.getNotes()+"-"+pro.getUnits()+" cant.:"+pro.getQty(),null);
+                  listProductos.append(pro.getKey()+" "+pro.getNotes()+"-"+pro.getUnits()+" cant.:"+pro.getQty()+"p y "+pro.getBoni()+"b",null);
                   listaProductos.addElement(pro);
                 }
     } else if (command == okCommand17) {//GEN-LINE:|7-commandAction|13|1344-preAction
  // write pre-action user code here
+        
 switchDisplayable(null, getFormProd());//GEN-LINE:|7-commandAction|14|1344-postAction
  if(swalert)
  {
@@ -947,23 +952,21 @@ switchDisplayable(null, getListProductos());//GEN-LINE:|7-commandAction|38|1330-
         if(buscarProducto(txtProductKey.getString()))
         {
             
-//        boolean resp = buscarProducto(txtProductKey.getString());
-////        txtProductKey.setText(""+resp);
-//        if(resp)
-//        {
+        /*    
 switchDisplayable(null, getFormCant());//GEN-LINE:|7-commandAction|40|1328-postAction
-//            if(formCant!=null)
-//            {
-//                formCant=null;
-//            }
-
-            getFormCant().setTitle(nombreProducto());
+          */
+            switchDisplayable(null, getFormCantidad()); 
+            formCant.setTitle(nombreProducto());
+            
+            
+            
         }
         else
         {  
-//           pantalla=PRODNOTFOUND;
-           switchDisplayable(getAlerta("Producto no Encontrado","Codigo de producto no valido! ",PRODNOTFOUND), getFormProd());
-//           switchDisplayable(getAlertaConfirmacion("Alerta de Duplicidad","Este producto ya se agrego la lista de Productos\n ¿Desea Modificar el Producto? "), getFormProd());
+
+             switchDisplayable(null, getFormProd());
+             getAlerta("Producto no Encontrado","Codigo de producto no valido! ");
+       
         }
     }
     else
@@ -3029,10 +3032,11 @@ String __selectedString = getListMenu().getString(getListMenu().getSelectedIndex
                 }
                 
                 /*
-switchDisplayable(null, getListProductos());//GEN-LINE:|1154-action|2|1158-postAction
+switchDisplayable (null, getListProductos ());//GEN-BEGIN:|1154-action|2|1158-postAction
+//GEN-END:|1154-action|2|1158-postAction
                 // write post-action user code here
                 */
-} else if (__selectedString.equals("  A\u00F1adir Cliente")) {//GEN-LINE:|1154-action|3|1159-preAction
+            } else if (__selectedString.equals("  A\u00F1adir Cliente")) {//GEN-LINE:|1154-action|3|1159-preAction
                 // write pre-action user code here
     if(cliente==null)
     {
@@ -4613,7 +4617,36 @@ formCant = new Form("form1", new Item[]{getStringItem3(), getTxtP(), getTxtU(), 
         return formCant;
     }
 //</editor-fold>//GEN-END:|1335-getter|2|
-
+public Form getFormCantidad() {
+        
+         if(formCant!=null)
+         {
+             formCant=null;
+         }
+             switch(product_state)
+                {
+                    case PAQUETE:
+                        Log.i("formCant","paquete");
+                        formCant = new Form("form1", new Item[]{getStringItem3(), getTxtP(), getStringItem4(), getTxtB(), getTxtD()});
+                       
+                        break;
+                    case UNIDAD:
+                        Log.i("formCant","unidad");
+                        formCant = new Form("form1", new Item[]{getStringItem3(), getTxtU(), getStringItem4(), getTxtB(), getTxtD()});
+                
+                        break;
+//                    case SINPRODUCTO:
+//                            switchDisplayable(null, getListMenu());
+//                        break;
+//                    default: switchDisplayable(null, getListMenu());            
+                }                                    
+            formCant.addCommand(getOkCommand16());
+            formCant.addCommand(getOkCommand17());
+            formCant.setCommandListener(this);                                      
+ 
+                                  
+        return formCant;
+    }
 //<editor-fold defaultstate="collapsed" desc=" Generated Getter: okCommand17 ">//GEN-BEGIN:|1343-getter|0|1343-preInit
     /**
      * Returns an initialized instance of okCommand17 component.
@@ -7010,7 +7043,7 @@ public TextField getTextNativo()
     public void getAlerta(final String titulo,final String mensaje)
     {   
         //#style mailAlert
-        Alert error = new Alert(titulo,mensaje , null, AlertType.INFO);
+        Alert error = new Alert(titulo,mensaje , getImageInfo(), AlertType.INFO);
         error.setTimeout(1212313123);
         Display.getDisplay(this).setCurrent(error);
     }

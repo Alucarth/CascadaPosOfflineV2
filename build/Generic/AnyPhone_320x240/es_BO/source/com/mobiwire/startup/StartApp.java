@@ -79,6 +79,10 @@ public class StartApp extends MIDlet implements CommandListener {
     private final int LISTMENU=11;
     private final int CLIENTES=12;
     private final int PRODNOTFOUND=9;
+    
+    private final int PAQUETE=1;
+    private final int UNIDAD=2;
+    private final int SINPRODUCTO=0;
         public static final String MIDLET_URL = "http://pos.sigcfactu.com.bo/offline/CascadaOfflinePOS.jad";
      private String version ="3.9.5";
     
@@ -193,6 +197,9 @@ public class StartApp extends MIDlet implements CommandListener {
       BufferRest br;
        RestProductor restProductor;
        RestConsumidor restConsumidor;
+       
+       //variable de manejo de tipo de producto
+       int product_state=0;
       
       
 //<editor-fold defaultstate="collapsed" desc=" Generated Fields ">//GEN-BEGIN:|fields|0|
@@ -367,22 +374,7 @@ public class StartApp extends MIDlet implements CommandListener {
           ba = new BmpArray();
 //        rest = new Rest();
           index=-1;
-//        new Thread(new Runnable()
-//        {
-//            public void run()
-//            {
-//                //creando leyenda y actividad XD
-//                
-//                v = TextLine("\"ESTA FACTURA BRIAN CONTRIBUYE AL DESARROLLO DEL PAIS, EL USO ILICITO DE ESTA SERA SANCIONADO DE ACUERDO A LEY\"",40);
-//                try{
-//                        leyenda = ba.readImage(BMPGenerator.encodeBMP(getLeyenda(v)));
-//                                     }catch(IOException e){}
-//                                     try{
-//                                        actividad = ba.readImage(BMPGenerator.encodeBMP(getActividad()));
-//                                     }catch(IOException es){}
-//            }
-//        }).start();
-////       
+    
         
         // loading store
            this.storage = new RmsStorage();
@@ -406,7 +398,7 @@ public class StartApp extends MIDlet implements CommandListener {
                 try {
 			serverSaved = (ServerTxt) this.storage.read("servertxt");
 			Log.i("Base de datos"," server txt "+serverSaved.getClientesTxt());
-                  
+                        
 			
 		} catch (IOException e) {
                 
@@ -488,9 +480,6 @@ public class StartApp extends MIDlet implements CommandListener {
                 }
                 facturasbackup = facturasbackupSaved;
                 
-               
-                        
-//                llave= user.getUsuario()+":"+user.getPassword();
 			
     }
 
@@ -780,17 +769,11 @@ exitMIDlet();//GEN-LINE:|7-commandAction|2|1312-postAction
     if (command == okCommand16) {//GEN-END:|7-commandAction|11|1337-preAction
  // write pre-action user code here
 //        **************************************************************************************************************
-        
-        pantalla = CANTPROD;
+               
                 if (estaVacio(txtP) && estaVacio(txtU))
                 {
                     
-//                    switchDisplayable(getProblemas(),getFormCant());
-                      
-    //                    
-                    pantalla = CANTPROD;
-//                   txtP.setText("1");
-                   switchDisplayable(getProblemas(), getFormCant());
+                    getAlerta("Sin producto", "Por favor ingrese la cantidad del producto");
                 }
                 else
                 {
@@ -798,7 +781,8 @@ exitMIDlet();//GEN-LINE:|7-commandAction|2|1312-postAction
 switchDisplayable (null, getListProductos ());//GEN-BEGIN:|7-commandAction|12|1337-postAction
 //GEN-END:|7-commandAction|12|1337-postAction
           */    
-                cambiarPantalla();
+//                cambiarPantalla();
+                switchDisplayable (null, getListProductos ());  
                 Products productoSeleccionado =(Products) cuenta.getProductos().elementAt(puntero);
                 Products pro = new Products();
                 pro.setId(productoSeleccionado.getId());
@@ -817,41 +801,51 @@ switchDisplayable (null, getListProductos ());//GEN-BEGIN:|7-commandAction|12|13
 //                    txtP.setText("0");
 //                }
 //                if(txtU.getString())
-                int p=0;
-                if(!txtP.getString().equals(""))
+                
+                 switch(product_state)
                 {
-                    p=Integer.parseInt(txtP.getString());
+                    case PAQUETE:
+                        int p=0;
+                        if(!txtP.getString().equals(""))
+                        {
+                            p=Integer.parseInt(txtP.getString());
+                            pro.setQty(p+"");
+                            pro.setPaquete(p+"");
+                            pro.setUnidad("0");
+                        }
+                        break;
+                    case UNIDAD:
+                          int u=0;
+                          
+                        if(!txtU.getString().equals(""))
+                        {
+                           u=Integer.parseInt(txtU.getString());
+                        }
+                        pro.setQty(u+"");
+                        pro.setPaquete("0");
+                        pro.setUnidad(u+"");
+                        break;
+                    case SINPRODUCTO:
+                            switchDisplayable(null, getListMenu());
+                        break;
+                    default: switchDisplayable(null, getListMenu());            
                 }
-                int u=0;      
-                if(!txtU.getString().equals(""))
-                {
-                   u=Integer.parseInt(txtU.getString());
-                }
-                int c;
-                c=(int)(p* Integer.parseInt(pro.getUnits()))+u;
-//                aux = c;
-//                double p = Integer.parseInt(pro.getUnits());
-//                pro.setQty((Integer.parseInt(txtP.getString())*Integer.parseInt(pro.getUnits()))+"");
-//                pro.setQty(txtP.getString()+"");
                 
                  if(!txtB.getString().equals(""))
                  {
                    pro.setBoni(txtB.getString());
-                   c=c+Integer.parseInt(txtB.getString());
                  }
 //              
                  if(!txtD.getString().equals(""))
                  {
                      pro.setDesc(txtD.getString().replace(',', '.'));
                  }
-                 pro.setQty(c+"");
-                 pro.setPaquete(p+"");
-                 pro.setUnidad(u+"");
-                  listProductos.append(pro.getKey()+" "+pro.getNotes()+"-"+pro.getUnits()+" cant.:"+pro.getQty(),null);
+                  listProductos.append(pro.getKey()+" "+pro.getNotes()+"-"+pro.getUnits()+" cant.:"+pro.getQty()+"p y "+pro.getBoni()+"b",null);
                   listaProductos.addElement(pro);
                 }
     } else if (command == okCommand17) {//GEN-LINE:|7-commandAction|13|1344-preAction
  // write pre-action user code here
+        
 switchDisplayable(null, getFormProd());//GEN-LINE:|7-commandAction|14|1344-postAction
  if(swalert)
  {
@@ -958,23 +952,21 @@ switchDisplayable(null, getListProductos());//GEN-LINE:|7-commandAction|38|1330-
         if(buscarProducto(txtProductKey.getString()))
         {
             
-//        boolean resp = buscarProducto(txtProductKey.getString());
-////        txtProductKey.setText(""+resp);
-//        if(resp)
-//        {
+        /*    
 switchDisplayable(null, getFormCant());//GEN-LINE:|7-commandAction|40|1328-postAction
-//            if(formCant!=null)
-//            {
-//                formCant=null;
-//            }
-
-            getFormCant().setTitle(nombreProducto());
+          */
+            switchDisplayable(null, getFormCantidad()); 
+            formCant.setTitle(nombreProducto());
+            
+            
+            
         }
         else
         {  
-//           pantalla=PRODNOTFOUND;
-           switchDisplayable(getAlerta("Producto no Encontrado","Codigo de producto no valido! ",PRODNOTFOUND), getFormProd());
-//           switchDisplayable(getAlertaConfirmacion("Alerta de Duplicidad","Este producto ya se agrego la lista de Productos\n ¿Desea Modificar el Producto? "), getFormProd());
+
+             switchDisplayable(null, getFormProd());
+             getAlerta("Producto no Encontrado","Codigo de producto no valido! ");
+       
         }
     }
     else
@@ -2862,15 +2854,15 @@ ImprimirFactura = new Command("Imprimir ", Command.OK, 0);//GEN-LINE:|1139-gette
                                              +sincredito_fiscal11+"|"+descuentos_bonificacion;
                                 
                                 
-                                qrCodeImage = encode(datos);
+//                                qrCodeImage = encode(datos);
 
                                 byte imagen[] =  ba.readImage(BMPGenerator.encodeBMP(qrCodeImage));
         
-                                Vector v= VectorProductos(factura.getInvoiceItems());
+//                                Vector v= VectorProductos(factura.getInvoiceItems());
                                 //mejorando la velocidad de impresion
    
                                  Vector vec = TextLine(factura.getLaw());
-                                Imprimir(factura,imagen,v,vec);
+//                                Imprimir(factura,imagen,v,vec);
                                 cambiarPantalla();
                             } catch (IOException ex) {
                                 ex.printStackTrace();
@@ -3030,9 +3022,21 @@ String __selectedString = getListMenu().getString(getListMenu().getSelectedIndex
         if (__selectedString != null) {
             if (__selectedString.equals("   A\u00F1adir producto")) {//GEN-END:|1154-action|1|1158-preAction
                 // write pre-action user code here
-switchDisplayable(null, getListProductos());//GEN-LINE:|1154-action|2|1158-postAction
+                if(product_state==SINPRODUCTO)
+                {
+                    switchDisplayable(getSelectVenta(), getListProductos());
+                }
+                else
+                {
+                switchDisplayable(null, getListProductos());
+                }
+                
+                /*
+switchDisplayable (null, getListProductos ());//GEN-BEGIN:|1154-action|2|1158-postAction
+//GEN-END:|1154-action|2|1158-postAction
                 // write post-action user code here
-} else if (__selectedString.equals("  A\u00F1adir Cliente")) {//GEN-LINE:|1154-action|3|1159-preAction
+                */
+            } else if (__selectedString.equals("  A\u00F1adir Cliente")) {//GEN-LINE:|1154-action|3|1159-preAction
                 // write pre-action user code here
     if(cliente==null)
     {
@@ -3626,6 +3630,17 @@ try {//GEN-BEGIN:|1246-getter|1|1246-@java.io.IOException
                                   
         return imagen;
     }
+     public Image getImageQuestion() {
+        Image  imagen=null;
+                 try {                                                    
+                     imagen = Image.createImage("/msg_question.png");
+                    } catch (java.io.IOException e) {                                                  
+                        e.printStackTrace();
+                    }                                       
+                    // write post-init user code here
+                                  
+        return imagen;
+    }
 //<editor-fold defaultstate="collapsed" desc=" Generated Getter: okRegistrar ">//GEN-BEGIN:|1252-getter|0|1252-preInit
 
     /**
@@ -4099,7 +4114,7 @@ try {//GEN-BEGIN:|1282-getter|1|1282-@java.io.IOException
                                 
                                 
                             
-                         qrCodeImage = encode(datos);
+//                         qrCodeImage = encode(datos);
                                         
                                      //   imprimir.printBitmap(ba.readImage(BMPGenerator.encodeBMP(qrCodeImage)));
                                 
@@ -4108,7 +4123,7 @@ try {//GEN-BEGIN:|1282-getter|1|1282-@java.io.IOException
                         
                         byte imagen[] =  ba.readImage(BMPGenerator.encodeBMP(qrCodeImage));
 //                        byte imagenActividad[] =ba.readImage(BMPGenerator.encodeBMP(imgActividad));
-                        Vector v= VectorProductos(factura.getInvoiceItems());
+//                        Vector v= VectorProductos(factura.getInvoiceItems());
                         
                         //mejorando velocidad de impresion
 //                          ByteIpx bi[]=new ByteIpx[v.size()];
@@ -4120,7 +4135,7 @@ try {//GEN-BEGIN:|1282-getter|1|1282-@java.io.IOException
 //                            ipx.setBi(bas);
 //                        }
                          Vector vec = TextLine(factura.getLaw());
-                        Imprimir(factura,imagen,v,vec);
+//                        Imprimir(factura,imagen,v,vec);
                         cambiarPantalla();
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -4602,7 +4617,36 @@ formCant = new Form("form1", new Item[]{getStringItem3(), getTxtP(), getTxtU(), 
         return formCant;
     }
 //</editor-fold>//GEN-END:|1335-getter|2|
-
+public Form getFormCantidad() {
+        
+         if(formCant!=null)
+         {
+             formCant=null;
+         }
+             switch(product_state)
+                {
+                    case PAQUETE:
+                        Log.i("formCant","paquete");
+                        formCant = new Form("form1", new Item[]{getStringItem3(), getTxtP(), getStringItem4(), getTxtB(), getTxtD()});
+                       
+                        break;
+                    case UNIDAD:
+                        Log.i("formCant","unidad");
+                        formCant = new Form("form1", new Item[]{getStringItem3(), getTxtU(), getStringItem4(), getTxtB(), getTxtD()});
+                
+                        break;
+//                    case SINPRODUCTO:
+//                            switchDisplayable(null, getListMenu());
+//                        break;
+//                    default: switchDisplayable(null, getListMenu());            
+                }                                    
+            formCant.addCommand(getOkCommand16());
+            formCant.addCommand(getOkCommand17());
+            formCant.setCommandListener(this);                                      
+ 
+                                  
+        return formCant;
+    }
 //<editor-fold defaultstate="collapsed" desc=" Generated Getter: okCommand17 ">//GEN-BEGIN:|1343-getter|0|1343-preInit
     /**
      * Returns an initialized instance of okCommand17 component.
@@ -5661,385 +5705,13 @@ public TextField getTextNativo()
     return tnativo;
 }
 
-//para la cascada --------------------------------------------------------------------------------------------
- public void Imprimir(Factura factura, byte[] ImagenQr,Vector DetalleProductos,Vector vec)
-    {
-//     double monto = Double.parseDouble(factura.getAmount());
-        //hacer todos los procesos antes de imprimir XD
-        Converter conv= new Converter();
-        Vector vnombre = TextLine("NOMBRE: "+factura.getCliente().getRazon(),36);
-        Vector literal = TextLine("SON: "+conv.getStringOfNumber(factura.getAmount()),39);
-        Vector vactividad = TextLine(cuenta.getSucursal().getActivity_pri(),40);
-        Vector s = TextLine("\"ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAIS, EL USO ILICITO DE ESTA SERA SANCIONADO DE ACUERDO A LEY\"",40);
-        Vector vterceros = TextLine(cuenta.getSucursal().getName(),40);
-        sumatotales = 0;
-        byte titulos[]= null;
-        //algoritmo de impresion de invoice items
-        try {
-             titulos = ba.readImage(BMPGenerator.encodeBMP(getInvoiceItemTitulo("Cant.","Precio","Importe")));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-         byte printLine[] =null;
-        try {
-            printLine = ba.readImage(BMPGenerator.encodeBMP(getLinea()));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        Vector prods = new Vector();
-        
-         for(int i=0;i<factura.getInvoiceItems().size();i++)
-                                    {   
-                                        try {
-                                            InvoiceItem invitem = (InvoiceItem) factura.getInvoiceItems().elementAt(i);
-                                            
-//                                        String concepto =(String) conceptos.elementAt(i);
-//                                            imprimir.printText(invitem.getNotes(), 1);
-                                            
-//                                            double cant = Double.parseDouble(invitem.getQty());
-//                                            double subTotal = (Double.parseDouble(invitem.getCost())*cant);
-//                                            double costo =Double.parseDouble(invitem.getCost());
-                                            double cant = Double.parseDouble(invitem.getQty()); 
-                                            double costo = Double.parseDouble(invitem.getCost()); 
-                                            double subTotal = costo*cant;
-                                            
-                                            
-//                                            double c = Double.parseDouble(invitem.getQty());
-                                            sumatotales = sumatotales+redondeo(subTotal,2);
-                                            
-//                                        ba = (byte[]) DetalleProductos.elementAt(i);
-                                             //Todo: problemas con la converion numerica no imprime XD
-                                            byte[] b = ba.readImage(BMPGenerator.encodeBMP(getInvoiceItem(""+redondeo(cant,2),""+redondeo(costo,2),""+redondeo(subTotal,2))));
-                                            prods.addElement(b);
-                                        } catch (IOException ex) {
-                                            ex.printStackTrace();
-                                        }
 
-        }
-        
-        
-        byte Vs[] = null;
-        byte Vvec[] = null;
-        try {
-            Vs = this.ba.readImage(BMPGenerator.encodeBMP(getLeyenda(s)));
-            Vvec = this.ba.readImage(BMPGenerator.encodeBMP(getLeyenda(vec)));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        
-                    imprimir = Printer.getInstance();
-                    switch (imprimir.getPaperStatus()) // check paper status
-			{
-			case Printer.PRINTER_EXIST_PAPER:
-				if (imprimir.voltageCheck()) // check voltage, if it is allowed to
-											// print
-				{
-                                    //Imprimiendo Factura
-                                    DeviceOps deviceOps = DeviceOps.getInstance();
-//                                    imprimir.printBitmap(deviceOps.readImage("/FAC_tigo2.bmp", 0));
-//                                    //imprimir.printBitmap(deviceOps.readImage("/viva.bmp", 0));
-                                    //Encabezado 
-                                    if(cuenta.getSucursal().getTerceros().equals("1")){
-                                    for(int j=0;j<vterceros.size();j++)
-                                    {
-                                         String linea = (String) vterceros.elementAt(j);
-                                        imprimir.printText(linea, 1);
-                                    }
-                                    }
-                                    imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-                                    imprimir.printTextWidthHeightZoom(ConstruirFilaA("La Cascada S.A"), 2, 1);
-//                                    imprimir.printTextWidthHeightZoom(ConstruirFilaA(), 2, 1);
-//                                    imprimir.printText(ConstruirFila(factura.getAccount().getName()), 1);
-                                    imprimir.printText(ConstruirFila(factura.getAddress1()), 1);
-                                    imprimir.printText(ConstruirFila(factura.getAddress2()), 1);
-//                                    imprimir.printText(ConstruirFila("SFC-001"), 1);
-                                    if(cuenta.getSucursal().getTerceros().equals("1")){ 
-                                        imprimir.printText("            FACTURA POR TERCEROS", 1); 
-                                    } 
-                                    else { 
-                                        if(cuenta.getSucursal().getTerceros().equals("2")){ 
-                                            imprimir.printText("                       FACTURA", 1);
-                                        } 
-                                    } // else{ // imprimir.printText(" FACTURA SHIT", 1); // } }
-                                    //imprimir.printText("            FACTURA POR TERCEROS", 1);
-                                    imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-                                    //Datos de la Empresa
-                                    imprimir.printText(ConstruirFila("NIT: "+factura.getAccount().getNit()), 1);
-                                    imprimir.printText(ConstruirFila("No. FACTURA "+factura.getInvoiceNumber()), 1);
-                                    imprimir.printText(" No. AUTORIZACION "+factura.getNumAuto(), 1);
-                                    imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-                                    //Datos del cliente
-                                    //Colocar Actividad Economica  PRODUCCI\u00D3N DE AGUAS MINERALES
-                                    
-//                                    imprimir.printText("ELABORACI\u00D3N DE BEBIDAS NO ALCOH\u00D3LICAS",1);
-//                                    imprimir.printText("PRODUCCI\u00D3N DE AGUAS MINERALES.",1);
-//                                    ImprimirActividad();
-//                                    imprimir.printBitmap(actividad);
-                                     for(int j=0;j<vactividad.size();j++)
-                                    {
-                                        String linea = (String) vactividad.elementAt(j);
-                                        imprimir.printText(linea, 1);
-                                    }
-                                    imprimir.printText("FECHA: "+factura.getInvoiceDate()+"         Hora: "+DateUtil.dateToString1(), 1);
-                                    imprimir.printText("NIT/CI: "+factura.getCliente().getNit()+"        COD.:"+factura.getCliente().getId(), 1);
-//                                    imprimir.printText("NOMBRE: "+factura.getCliente().getName(), 1);
-                                    for(int j=0;j<vnombre.size();j++)
-                                    {
-                                        String linea = (String) vnombre.elementAt(j);
-                                        imprimir.printText(linea, 1);
-                                    }
-                                        
-                                    
-//                                    imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-                                    //invoice items
-//                                    imprimir.printText(ConstruirFila("CANT.","CONCEPTO P.U.","TOTAL"), 1);
-//                                    imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-//                                 
-                                    //productos impresos por hardware
-//                                    for(int i =0;i<factura.getInvoiceItems().size();i++)
-//                                        {
-//                                        InvoiceItem invitem = (InvoiceItem) factura.getInvoiceItems().elementAt(i);
-//                                        
-//                                        
-////                                        String cantidad= Integer.parseInt(invitem.getQty());
-//                                        String cantidad = invitem.getQty();
-//                                        
-//                                        double subTotal = (Double.parseDouble(invitem.getCost())*Double.parseDouble(invitem.getQty()));
-//                                        double costo =Double.valueOf(invitem.getCost()).doubleValue();
-//                                        String concepto = invitem.getNotes();
-//                                        double c = Double.valueOf(cantidad).doubleValue();
-//                                        
-//                                        imprimir.printText(ConstruirFila(""+(int)c,concepto,redondeo(costo,2)+" "+redondeo(subTotal,2)), 1);
-//                                        
-////                                
-//                                
-//                                      }
-                                    //productos impresoso por software
-                                    
-//                                    byte ba[];
-//                                    for(int i=0;i<DetalleProductos.size();i++)
-//                                    {
-//                                        
-//                                        ba = (byte[]) DetalleProductos.elementAt(i);
-//                                        imprimir.printBitmap(ba);
-//
-//                                    }
-                                    
-                                    //productos impresion por texto
-                                    imprimir.printBitmap(titulos);
-                                    for(int i=0;i<factura.getInvoiceItems().size();i++)
-                                    {   
-                                        InvoiceItem invitem = (InvoiceItem) factura.getInvoiceItems().elementAt(i);
-                                        
-                                        Vector vl = TextLine(invitem.getNotes(),36);
-                                        for(int y = 0;y<vl.size();y++)
-                                        {
-                                            String l = (String) vl.elementAt(y);
-                                            imprimir.printText(l, 1);
-                                        }
-//                                        imprimir.printText(invitem.getNotes(), 1);
-                                        byte  b[] = (byte[]) prods.elementAt(i);
-                                        imprimir.printBitmap(b);
-
-                                    }
-                                    
-                                    imprimir.printBitmap(printLine);
-//                                    imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-//                                  segundo metodo
-//                                    for(int i=0;i<bi.length;i++)
-//                                    {
-//                                        imprimir.printBitmap(bi[i].getBi());
-//                                    }
-//                                    
-                                    
-//                                  imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-                                    imprimir.printText("                          TOTAL: Bs "+factura.getSubtotal(), 1);                                 
-//                                    imprimir.printText("TOTAL: "+factura.getSubtotal(), 1);
-                                    double descuento = Double.parseDouble(factura.getSubtotal())-Double.parseDouble(factura.getAmount());
-//                                    double descuento = sumatotales-Double.parseDouble(factura.getAmount());
-                                    imprimir.printText("ICE: "+factura.getIce(), 1);
-                                    
-                                    imprimir.printText("DESCUENTOS/BONIFICACION: "+redondeo(descuento,2)+"", 1);
-                                  
-                                    imprimir.printText("IMPORTE BASE CREDITO FISCAL: "+factura.getFiscal(),1);
-                                    imprimir.printText("MONTO A PAGAR: Bs "+factura.getAmount(),1);
-                                     
-                                   
-//                                    imprimir.printText("SON:"+NumeroLiteral(""+monto)+"Bolivianos",1);
-//                                    imprimir.printText("SON: "+conv.getStringOfNumber(factura.getAmount()),1);
-                                    for(int j=0;j<literal.size();j++)
-                                    {
-                                        String linea = (String) literal.elementAt(j);
-                                        imprimir.printText(linea, 1);
-                                    }
-                                    imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-                                    //imprimir impuesto ic 
-                                   // imprimir.printText()
-                                    
-                                    imprimir.printText("CODIGO DE CONTROL: "+factura.getControlCode(),1);
-                                    imprimir.printText("FECHA LIMITE EMISION: "+factura.getFechaLimite(),1);
-                                    imprimir.printText("USUARIO: "+user.getUsuario(), 1);
-                                    
-//                                            imprimir.printBitmap(ImagenQr);
-                                    
-//                                    imprimir.printEndLine();
-//                                    imprimir.printText("CSD:"+operador.getId()+" "+operador.getUsuario() +"-"+factura.getDatecom(), 1);
-//                                    imprimir.printText("CSD:143 farbo-18:00:35", 1);
-                                    
-                                    
-                                    try { 
- 
-                                        imprimir.printBitmap(ImagenQr);
-                                       
-
-                                    } catch (Exception ex) {
-                                       
-                                     
-                                    }
-//                                  BmpArray b = new BmpArray();
-//                                      Vector leyenda= TextLine("'ESTA FACTURA CONTRIBUYE AL DESARROLLO DEL PAIS, EL USO ILICITO DE ESTA SERA SANCIONADO DE ACUERDO A LEY'");
-                                      imprimir.printBitmap(deviceOps.readImage("/leyenda_generica.bmp", 0));
-//                                     try{
-//                                         imprimir.printBitmap(Vs);
-//                                         
-//                                     }catch(Exception e){}
-
-//                                      Vector vec = TextLine(factura.getLaw());
-//                                       BmpArray b2 = new BmpArray(this);
-                                     
-                                    try {
-                                        imprimir.printBitmap(Vvec);
-                           //                                     imprimir.printBitmap(b.readImage(BMPGenerator.encodeBMP(getLeyenda(vec))),0);
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
-//                                     imprimir.printBitmap(deviceOps.readImage("/linea.bmp", 0));
-//                                     imprimir.printBitmap(deviceOps.readImage("/logo_pie.bmp", 0));
-                                     imprimir.printText(ConstruirFila("www.emizor.com"), 1);
-                                     imprimir.printEndLine();
-                                    
-                                    
-                                    
-                                    
-				} else {
-					tickerLogin.setText("Bateria baja!! ");
-				
-				}
-				break;
-			case Printer.PRINTER_NO_PAPER:
-                                tickerLogin.setText("Verifique el estado del papel!! ");
-				break;
-			case Printer.PRINTER_PAPER_ERROR:
-                                tickerLogin.setText("Error de impresión!! ");
-				break;
-			}
-                   sumatotales=0;
-    }
     private double redondeo(double num,int numDecim){
         long p=1;
         for(int i=0; i<numDecim; i++)p*=10;
         return (double)(int)(p * num + 0.5) / p;
     }
  
-    /*
-     * Parametros Cad1:  
-     * Se contruye una fila con 32 caracteres y la variable Cad1 centrado
-     * 
-     */
-    public String ConstruirFilaA(String cad1)
-    {
-        String fila=cad1;
-        String espacio =" ";
-        int size = (28-cad1.length())/2;
-         for(int i=0;i<size;i++)
-        {
-            fila = espacio+fila ;
-        }
-                
-        return fila;
-    }
-    public String ConstruirFila(String cad1)
-    {
-        String fila=cad1;
-        String espacio =" ";
-        int size = (56-cad1.length())/2;
-         for(int i=0;i<size;i++)
-        {
-            fila = espacio+fila ;
-        }
-                
-        return fila;
-    }
-    public String ConstruirFila(String cad1,int espacios)
-    {
-        String fila=cad1;
-        String espacio =" ";
-        int size = espacios-cad1.length();
-         for(int i=0;i<size;i++)
-        {
-            fila = fila +espacio;
-        }
-                
-        return fila;
-    }
-     public String ConstruirFila(String cad1,String cad2)
-    {
-        String fila=cad1;
-        String espacio =" ";
-        int size = 32- cad2.length()-cad1.length();
-        for(int i=0;i<size;i++)
-        {
-            fila = fila +espacio;
-        }
-        fila = fila+cad2;
-        
-        return fila;
-    }
-     public String ConstruirFilaA(String cantidad,String concepto,String monto)
-     {
-         String linea="";
-          String espacio =" ";
-         linea = ""+cantidad+" ";
-         Tokenizer tk = new Tokenizer(concepto," ");
-         String con=tk.nextToken();
-         int size=15-con.length();
-         for(int i=0;i<size;i++)
-         {
-             con = con+ espacio;
-         }
-         linea = linea +con;
-         size = 7-monto.length();
-         String m=monto;
-         for(int i=0;i<size;i++)
-         {
-             m = espacio+m;
-         }
-         linea = linea+m;
-         size = 7-monto.length();
-         String m2=monto;
-         for(int i=0;i<size;i++)
-         {
-             m2 = espacio+ m2;
-         }
-         linea = linea+m2;
-         return linea;
-     }
-     public String ConstruirFila(String cantidad,String concepto,String monto)
-     {
-         String linea=""+cantidad+" "+concepto;
-         String espacio =" ";
-                  
-         int size=32-linea.length()-monto.length();
-         for(int i=0;i<size;i++)
-         {
-             linea = linea+ espacio;
-         }
-         linea = linea +monto;
-         
-         return linea;
-     }
-
-
     
     public Display getDisplay() {
         return Display.getDisplay(this);
@@ -6070,7 +5742,7 @@ public TextField getTextNativo()
         midletPaused = true;
     }
     public void destroyApp(boolean unconditional){
-//        Thread tg = new Thread(){
+de.enough.polish.util.Debug.exit();//        Thread tg = new Thread(){
 //            public void run()
 //            {   
 //               try {
@@ -6435,320 +6107,13 @@ public TextField getTextNativo()
         dis.close();
     }
   }
-    private javax.microedition.lcdui.Image encode(String content) throws IOException {
-        try {
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            int qrWidth = 200;
-            int qrHeigth = 200;
-            BitMatrix qrBitMatrix = qrCodeWriter.encode(content,BarcodeFormat.QR_CODE, qrWidth, qrHeigth);
-            int[] rgb = new int[qrWidth * qrHeigth];
-            
-            for (int y = 0; y < qrBitMatrix.getHeight(); y++)
-            {
-                for (int x = 0; x < qrWidth; x++)
-                {
-                    int offset = y * qrHeigth;
-                    rgb[offset + x] = qrBitMatrix.get(x, y) ? BACK : WHTIE;
-                }
-            }
-            // Tambien intente usar esta forma para crear la imagen e intentar imprimir directamente el array de byte
-            // Also try using this way to create the image and try to directly print the byte array
-            
-            
-            
-            return Image.createRGBImage(rgb, qrWidth, qrHeigth, false);
-            
-            
-            // 
-        
-        } catch (WriterException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    private javax.microedition.lcdui.Image codificarQr(String content) throws IOException {
-        try {
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            int qrWidth = 200;
-            int qrHeigth = 200;
-            BitMatrix qrBitMatrix = qrCodeWriter.encode(content,BarcodeFormat.QR_CODE, qrWidth, qrHeigth);
-            int[] rgb = new int[qrWidth * qrHeigth];
-            
-            for (int y = 0; y < qrBitMatrix.getHeight(); y++)
-            {
-                for (int x = 0; x < qrWidth; x++)
-                {
-                    int offset = y * qrHeigth;
-                    rgb[offset + x] = qrBitMatrix.get(x, y) ? BACK : WHTIE;
-                }
-            }
-            // Tambien intente usar esta forma para crear la imagen e intentar imprimir directamente el array de byte
-            // Also try using this way to create the image and try to directly print the byte array
-            
-            javax.microedition.lcdui.Image qr =Image.createRGBImage(rgb, qrWidth, qrHeigth, false);
-            
-//            return Image.createRGBImage(rgb, qrWidth, qrHeigth, false);
-            javax.microedition.lcdui.Image QrCenter = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),qr.getHeight());
-            javax.microedition.lcdui.Graphics g = QrCenter.getGraphics();
-            g.drawImage(qr, 104, 0, 0);
-            return QrCenter;
-            // 
-        
-        } catch (WriterException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-     private Image getLinea()
-     {
-         javax.microedition.lcdui.Image temp = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),5);
-         javax.microedition.lcdui.Graphics g = temp.getGraphics();
-         g.setColor(0x000000);
-         javax.microedition.lcdui.Font myFont;
-         myFont = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_BOLD | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_MEDIUM);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-         g.setFont(myFont);
-         
-         g.drawLine(0,3, getImage12().getWidth(), 3);
-         g.drawLine(0,4, getImage12().getWidth(), 4);
-         
-         return temp;
-     }
-     private Image getInvoiceItem(String cantidad,String pu,String total)
-     {
-         int lineNumber = 18+1;
-         
-         
-         //posible error al crear la imagen en el alto esto debido a que no se realmente cual es el parametro  que se tiene qu dimenciona
-         javax.microedition.lcdui.Image temp = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),lineNumber);
-         javax.microedition.lcdui.Graphics g = temp.getGraphics();
-         g.setColor(0x000000);
-         javax.microedition.lcdui.Font myFont;
-//         javax.microedition.lcdui.Font myFont1;
-         myFont = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_PLAIN | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_MEDIUM);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-         g.setFont(myFont);
-         int c1,c2,c3;
-         int x=0;
-         g.drawString(cantidad, x, 0, 0);
-         x=x+152;
-         c1 = x;
-//          myFont1 = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_PLAIN | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_SMALL);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-//         g.setFont(myFont1);
-//         g.drawString(concepto, x, 0, 0);
-//         x=x+184;
-         c2 = x;
-         g.setFont(myFont);
-         g.drawString(pu,x,0,0);
-         x=x+100;
-         c3 = x;
-         g.drawString(total, x, 0, 0);
-//         g.d
-//         g.drawLine(c1-3,0,c1-3,lineNumber);
-//         g.drawLine(c2-3,0,c2-3,lineNumber);
-//         g.drawLine(c3-3,0,c3-3,lineNumber);
-//         g.drawLine(c1-3, 0, c1-3,lineNumber );
-//       para formtado de 20 caracteres  47,210,50
-//         fomato optimo a 15 caracteres 52,184,59
-         return temp;
-     }
-    
-     private javax.microedition.lcdui.Image getActividad()
-     {
-         //para la creacion de un a imagen j2me 240,50 maximo
-         //35
-         javax.microedition.lcdui.Image temp = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),36+1);
-         javax.microedition.lcdui.Graphics g = temp.getGraphics();
-         g.setColor(0x000000);
-         javax.microedition.lcdui.Font myFont;
-         myFont = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM, javax.microedition.lcdui.Font.STYLE_PLAIN | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_MEDIUM);
-//         BmpArray ba = new BmpArray();
-        g.setFont(myFont);
-//        g.drawString("01234567890123456789013245678901234568789",0, 0, javax.microedition.lcdui.Graphics.HCENTER | javax.microedition.lcdui.Graphics.TOP);
-//        g.drawString("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRST",0, 10, javax.microedition.lcdui.Graphics.HCENTER | javax.microedition.lcdui.Graphics.TOP);
-        g.drawString("Elaboración de bebidas no alcohólicas",0, 0,0);
-        g.drawString(" y producción aguas minerales.", 0, 15,0);
-     //   Printer imprimir= Printer.getInstance();
-                
-//        try { 
-//            imprimir.printBitmap(ba.readImage(BMPGenerator.encodeBMP(temp)));
-////            imprimir.printEndLine();
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-       return temp;
-     }
-     private javax.microedition.lcdui.Image getLeyenda(Vector v)
-     {
-         int lineNumber = (v.size()*18)+1;
-         
-         
-         //posible error al crear la imagen en el alto esto debido a que no se realmente cual es el parametro  que se tiene qu dimenciona
-         javax.microedition.lcdui.Image temp = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),lineNumber);
-         javax.microedition.lcdui.Graphics g = temp.getGraphics();
-         g.setColor(0x000000);
-         javax.microedition.lcdui.Font myFont;
-         myFont = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_PLAIN | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_SMALL);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-         g.setFont(myFont);
-//         g.drawString("01234567890123456789012345678901234567890123456789", 0, 0, 0);
-         //para el sato de linea se utilizar un valor de 15
-         int x=0;
-         for(int i =0; i<v.size();i++)
-         {
-             String cadena = (String) v.elementAt(i);
-             g.drawString(cadena, 0, x, 0);
-             x= x+15;
-         }
-         return temp;
-     }
-     private javax.microedition.lcdui.Image imprimirTexto(Vector v)
-     {
-         int lineNumber = (v.size()*18)+1;
-         
-         
-         //posible error al crear la imagen en el alto esto debido a que no se realmente cual es el parametro  que se tiene qu dimenciona
-         javax.microedition.lcdui.Image temp = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),lineNumber);
-         javax.microedition.lcdui.Graphics g = temp.getGraphics();
-         g.setColor(0x000000);
-         javax.microedition.lcdui.Font myFont;
-         myFont = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_PLAIN | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_MEDIUM);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-         g.setFont(myFont);
-//         g.drawString("01234567890123456789012345678901234567890123456789", 0, 0, 0);
-         //para el sato de linea se utilizar un valor de 15
-         int x=0;
-         for(int i =0; i<v.size();i++)
-         {
-             String cadena = (String) v.elementAt(i);
-             g.drawString(cadena, 0, x, 0);
-             x= x+15;
-         }
-         return temp;
-     }
-     private Image getInvoiceItemTitulo(String cantidad,String pu,String total)
-     {
-         int lineNumber = 18+15;
-         
-         
-         //posible error al crear la imagen en el alto esto debido a que no se realmente cual es el parametro  que se tiene qu dimenciona
-         javax.microedition.lcdui.Image temp = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),lineNumber);
-         javax.microedition.lcdui.Graphics g = temp.getGraphics();
-         g.setColor(0x000000);
-         javax.microedition.lcdui.Font myFont;
-         myFont = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_BOLD | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_MEDIUM);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-         g.setFont(myFont);
-         
-         int c1,c2,c3;
-         
-          int x=0;
-         
-         g.drawString(cantidad, x, 5, 0);
-         
-         x=x+152;
-//         c1=x;
-//         g.drawString(concepto, x, 0, 0);
-//         x=x+184;
-         c2 = x;
-         g.drawString(pu,x,5,0);
-         x=x+100;
-         c3 = x;
-         g.drawString(total, x, 5, 0);
-        
-         g.drawLine(0,25, getImage12().getWidth(), 25);
-         g.drawLine(0,26, getImage12().getWidth(), 26);
-//         g.drawLine(0,25, getImage12().getWidth(), 27);
-         g.drawLine(0,1, getImage12().getWidth(), 1); 
-         g.drawLine(0,2, getImage12().getWidth(), 2);
-         
-//         g.drawLine(c1-3,0,c1-3,lineNumber);
-//         g.drawLine(c2-3,0,c2-3,lineNumber);
-//         g.drawLine(c3-3,0,c3-3,lineNumber);
-
-         return temp;
-     }
-     private Image getInvoiceItem(String cantidad,String concepto,String pu,String total)
-     {
-         int lineNumber = 18+1;
-         
-         
-         //posible error al crear la imagen en el alto esto debido a que no se realmente cual es el parametro  que se tiene qu dimenciona
-         javax.microedition.lcdui.Image temp = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),lineNumber);
-         javax.microedition.lcdui.Graphics g = temp.getGraphics();
-         g.setColor(0x000000);
-         javax.microedition.lcdui.Font myFont;
-//         javax.microedition.lcdui.Font myFont1;
-         myFont = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_PLAIN | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_MEDIUM);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-         g.setFont(myFont);
-         int c1,c2,c3;
-         int x=0;
-         g.drawString(cantidad, x, 0, 0);
-         x=x+52;
-         c1 = x;
-//          myFont1 = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_PLAIN | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_SMALL);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-//         g.setFont(myFont1);
-         g.drawString(concepto, x, 0, 0);
-         x=x+184;
-         c2 = x;
-         g.setFont(myFont);
-         g.drawString(pu,x,0,0);
-         x=x+59;
-         c3 = x;
-         g.drawString(total, x, 0, 0);
-//         g.d
-         g.drawLine(c1-3,0,c1-3,lineNumber);
-         g.drawLine(c2-3,0,c2-3,lineNumber);
-         g.drawLine(c3-3,0,c3-3,lineNumber);
-//         g.drawLine(c1-3, 0, c1-3,lineNumber );
-//       para formtado de 20 caracteres  47,210,50
-//         fomato optimo a 15 caracteres 52,184,59
-         return temp;
-     }
-     private Image getInvoiceItemTitulo(String cantidad,String concepto,String pu,String total)
-     {
-         int lineNumber = 18+5;
-         
-         
-         //posible error al crear la imagen en el alto esto debido a que no se realmente cual es el parametro  que se tiene qu dimenciona
-         javax.microedition.lcdui.Image temp = javax.microedition.lcdui.Image.createImage(getImage12().getWidth(),lineNumber);
-         javax.microedition.lcdui.Graphics g = temp.getGraphics();
-         g.setColor(0x000000);
-         javax.microedition.lcdui.Font myFont;
-         myFont = javax.microedition.lcdui.Font.getFont(javax.microedition.lcdui.Font.FACE_SYSTEM,javax.microedition.lcdui.Font.STYLE_UNDERLINED | javax.microedition.lcdui.Font.STYLE_BOLD, javax.microedition.lcdui.Font.SIZE_MEDIUM);
-//        Font fontPolish = Font.getFont(Font.FACE_SYSTEM, Font.STYLE_BOLD, Font.SIZE_SMALL);
-         g.setFont(myFont);
-          int c1,c2,c3;
-         int x=0;
-         g.drawString(cantidad, x, 0, 0);
-         x=x+52;
-         c1=x;
-         g.drawString(concepto, x, 0, 0);
-         x=x+184;
-         c2 = x;
-         g.drawString(pu,x,0,0);
-         x=x+59;
-         c3 = x;
-         g.drawString(total, x, 0, 0);
-        
-         g.drawLine(0,20, getImage12().getWidth(), 20);
-         g.drawLine(0,21, getImage12().getWidth(), 21);
-         
-         g.drawLine(c1-3,0,c1-3,lineNumber);
-         g.drawLine(c2-3,0,c2-3,lineNumber);
-         g.drawLine(c3-3,0,c3-3,lineNumber);
-
-         return temp;
-     }
      
     public void NuevaFactura()
     {
      
         getListProductos().deleteAll();
         listaProductos.removeAllElements();
+        product_state=SINPRODUCTO;
         if(cliente!=null)
         {
             cliente =null;
@@ -7297,57 +6662,7 @@ public TextField getTextNativo()
      return splitArray;
     }
     
-    public Vector VectorProductos(Vector v)
-    {
-        Vector vd = new Vector();
-      
-        try{
-         vd.addElement(ba.readImage(BMPGenerator.encodeBMP(getInvoiceItemTitulo("CNT.","DETALLE","P.U.","TOTAL"))));
-          for(int i =0;i<v.size();i++)
-          {
-              
-           InvoiceItem invitem = (InvoiceItem) v.elementAt(i);
-           String cantidad = invitem.getQty();                             
-                                        
-           double subTotal = (Double.parseDouble(invitem.getCost())*Double.parseDouble(invitem.getQty()));
-           double costo =Double.valueOf(invitem.getCost()).doubleValue();
-           String concepto="";
-           if(invitem.getNotes().length()>14)
-           {
-               concepto = invitem.getNotes().substring(0,16);
-           }
-           else{   
-            concepto = invitem.getNotes();
-            }
-            double c = Double.valueOf(cantidad).doubleValue();
-                                        
-//           imprimir.printText(ConstruirFila(""+(int)c,concepto,redondeo(costo,2)+""+redondeo(subTotal,2)), 1);  
-           vd.addElement(ba.readImage(BMPGenerator.encodeBMP(getInvoiceItem(""+(int)c,concepto,""+redondeo(costo,2),""+redondeo(subTotal,2)))));
-                                        
-         }
-        }catch(Exception e){}
-       return vd;
-    }
-//    public boolean buscarCliente(Vector clientes,String idCliente)
-//    {
-//        boolean sw= false;
-//        punteroCliente = -1;
-//        for(int i=0;i<clientes.size();i++)
-//        {
-//            Clients cli =(Clients) clientes.elementAt(i);
-//            if(cli.getPublic_id().equals(idCliente))
-//            {
-////                cliente= (Clients) clientes.elementAt(i);
-//                punteroCliente = i;
-//                i=clientes.size();
-//                sw= true;
-//            }
-//        }
-//        
-//        
-//        return sw;
-//    }
-    private static int buscarCliente(Vector clientes,String publicId)
+     private static int buscarCliente(Vector clientes,String publicId)
     {
 //        Cliente clienteBuscado= null;
         int indice = -1;
@@ -7699,10 +7014,36 @@ public TextField getTextNativo()
         });
         return alert;
     }
-     public void getAlerta(final String titulo,final String mensaje)
+    public Alert getSelectVenta()
+    {
+        //#style mailAlert
+        Alert alert = new Alert("Tipo de Venta ", " Selecione un tipo de venta", getImageQuestion(), AlertType.CONFIRMATION, de.enough.polish.ui.StyleSheet.mailalertStyle );
+       final Command cmdPaquete = new Command(" Paquete", Command.OK, 1);
+       final Command cmdUnidad = new Command(" Unidad ", Command.BACK, 1);
+        
+        alert.addCommand(cmdPaquete);
+        alert.addCommand(cmdUnidad);
+        alert.setCommandListener(new CommandListener() {
+            public void commandAction(Command c, Displayable d) {
+                if (c == cmdPaquete) {
+                    product_state=PAQUETE;
+                   getListProductos().setTitle("Productos seleccionados en paquetes");
+                }else{
+                    product_state=UNIDAD;
+                    getListProductos().setTitle("Productos seleccionados en unidades");
+                }           
+                switchDisplayable (null, getListProductos());
+                
+                
+            }
+        });
+        return alert;
+    }
+   
+    public void getAlerta(final String titulo,final String mensaje)
     {   
         //#style mailAlert
-        Alert error = new Alert(titulo,mensaje , null, AlertType.INFO, de.enough.polish.ui.StyleSheet.mailalertStyle );
+        Alert error = new Alert(titulo,mensaje , getImageInfo(), AlertType.INFO, de.enough.polish.ui.StyleSheet.mailalertStyle );
         error.setTimeout(1212313123);
         Display.getDisplay(this).setCurrent(error);
     }
@@ -7737,7 +7078,8 @@ public TextField getTextNativo()
                             sucursal.borrar();
                             storage.save(sucursal, "sucursal");
                             System.out.print("usuario borrados en teoria");
-                          
+                            serverInfo.setClientesTxt("");
+                            storage.save(serverInfo, "servertxt");                            
                             
                             
 //                            this.llave =null;
