@@ -79,6 +79,10 @@ public class StartApp extends MIDlet implements CommandListener {
     private final int LISTMENU=11;
     private final int CLIENTES=12;
     private final int PRODNOTFOUND=9;
+    
+    private final int PAQUETE=1;
+    private final int UNIDAD=2;
+    private final int SINPRODUCTO=0;
         public static final String MIDLET_URL = "http://pos.sigcfactu.com.bo/offline/CascadaOfflinePOS.jad";
      private String version ="3.9.5";
     
@@ -193,6 +197,9 @@ public class StartApp extends MIDlet implements CommandListener {
       BufferRest br;
        RestProductor restProductor;
        RestConsumidor restConsumidor;
+       
+       //variable de manejo de tipo de producto
+       int product_state=0;
       
       
 //<editor-fold defaultstate="collapsed" desc=" Generated Fields ">//GEN-BEGIN:|fields|0|
@@ -337,8 +344,8 @@ public class StartApp extends MIDlet implements CommandListener {
     private Image image22;
     private Image image17;
     private Image image18;
-    private Ticker ticker;
     private Image image19;
+    private Ticker ticker;
     private Image image20;
     private Image image14;
     private Image image15;
@@ -391,7 +398,7 @@ public class StartApp extends MIDlet implements CommandListener {
                 try {
 			serverSaved = (ServerTxt) this.storage.read("servertxt");
 			Log.i("Base de datos"," server txt "+serverSaved.getClientesTxt());
-                  
+                        
 			
 		} catch (IOException e) {
                 
@@ -2852,7 +2859,7 @@ ImprimirFactura = new Command("Imprimir ", Command.OK, 0);//GEN-LINE:|1139-gette
                                 //mejorando la velocidad de impresion
    
                                  Vector vec = TextLine(factura.getLaw());
-                                Imprimir(factura,imagen,v,vec);
+//                                Imprimir(factura,imagen,v,vec);
                                 cambiarPantalla();
                             } catch (IOException ex) {
                                 ex.printStackTrace();
@@ -3012,8 +3019,19 @@ String __selectedString = getListMenu().getString(getListMenu().getSelectedIndex
         if (__selectedString != null) {
             if (__selectedString.equals("   A\u00F1adir producto")) {//GEN-END:|1154-action|1|1158-preAction
                 // write pre-action user code here
+                if(product_state==SINPRODUCTO)
+                {
+                    switchDisplayable(getSelectVenta(), getListProductos());
+                }
+                else
+                {
+                switchDisplayable(null, getListProductos());
+                }
+                
+                /*
 switchDisplayable(null, getListProductos());//GEN-LINE:|1154-action|2|1158-postAction
                 // write post-action user code here
+                */
 } else if (__selectedString.equals("  A\u00F1adir Cliente")) {//GEN-LINE:|1154-action|3|1159-preAction
                 // write pre-action user code here
     if(cliente==null)
@@ -3608,6 +3626,17 @@ try {//GEN-BEGIN:|1246-getter|1|1246-@java.io.IOException
                                   
         return imagen;
     }
+     public Image getImageQuestion() {
+        Image  imagen=null;
+                 try {                                                    
+                     imagen = Image.createImage("/msg_question.png");
+                    } catch (java.io.IOException e) {                                                  
+                        e.printStackTrace();
+                    }                                       
+                    // write post-init user code here
+                                  
+        return imagen;
+    }
 //<editor-fold defaultstate="collapsed" desc=" Generated Getter: okRegistrar ">//GEN-BEGIN:|1252-getter|0|1252-preInit
 
     /**
@@ -4102,7 +4131,7 @@ try {//GEN-BEGIN:|1282-getter|1|1282-@java.io.IOException
 //                            ipx.setBi(bas);
 //                        }
                          Vector vec = TextLine(factura.getLaw());
-                        Imprimir(factura,imagen,v,vec);
+//                        Imprimir(factura,imagen,v,vec);
                         cambiarPantalla();
                     } catch (IOException ex) {
                         ex.printStackTrace();
@@ -5643,7 +5672,7 @@ public TextField getTextNativo()
     return tnativo;
 }
 
-/
+
     private double redondeo(double num,int numDecim){
         long p=1;
         for(int i=0; i<numDecim; i++)p*=10;
@@ -6051,6 +6080,7 @@ public TextField getTextNativo()
      
         getListProductos().deleteAll();
         listaProductos.removeAllElements();
+        product_state=SINPRODUCTO;
         if(cliente!=null)
         {
             cliente =null;
@@ -6951,7 +6981,33 @@ public TextField getTextNativo()
         });
         return alert;
     }
-     public void getAlerta(final String titulo,final String mensaje)
+    public Alert getSelectVenta()
+    {
+        //#style mailAlert
+        Alert alert = new Alert("Tipo de Venta ", " Selecione un tipo de venta", getImageQuestion(), AlertType.CONFIRMATION);
+       final Command cmdPaquete = new Command(" Paquete", Command.OK, 1);
+       final Command cmdUnidad = new Command(" Unidad ", Command.BACK, 1);
+        
+        alert.addCommand(cmdPaquete);
+        alert.addCommand(cmdUnidad);
+        alert.setCommandListener(new CommandListener() {
+            public void commandAction(Command c, Displayable d) {
+                if (c == cmdPaquete) {
+                    product_state=PAQUETE;
+                   getListProductos().setTitle("Productos seleccionados en paquetes");
+                }else{
+                    product_state=UNIDAD;
+                    getListProductos().setTitle("Productos seleccionados en unidades");
+                }           
+                switchDisplayable (null, getListProductos());
+                
+                
+            }
+        });
+        return alert;
+    }
+   
+    public void getAlerta(final String titulo,final String mensaje)
     {   
         //#style mailAlert
         Alert error = new Alert(titulo,mensaje , null, AlertType.INFO);
@@ -6989,7 +7045,8 @@ public TextField getTextNativo()
                             sucursal.borrar();
                             storage.save(sucursal, "sucursal");
                             System.out.print("usuario borrados en teoria");
-                          
+                            serverInfo.setClientesTxt("");
+                            storage.save(serverInfo, "servertxt");                            
                             
                             
 //                            this.llave =null;
