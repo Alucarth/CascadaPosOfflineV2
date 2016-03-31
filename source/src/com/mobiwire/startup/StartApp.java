@@ -1,7 +1,5 @@
 package com.mobiwire.startup;
 
-
-
 import com.david.torrez.CodigoDeControl;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -344,8 +342,8 @@ public class StartApp extends MIDlet implements CommandListener {
     private Image image22;
     private Image image17;
     private Image image18;
-    private Ticker ticker;
     private Image image19;
+    private Ticker ticker;
     private Image image20;
     private Image image14;
     private Image image15;
@@ -769,7 +767,7 @@ exitMIDlet();//GEN-LINE:|7-commandAction|2|1312-postAction
     if (command == okCommand16) {//GEN-END:|7-commandAction|11|1337-preAction
  // write pre-action user code here
 //        **************************************************************************************************************
-               
+               Log.i("okCommand","presionando ");
                 if (estaVacio(txtP) && estaVacio(txtU))
                 {
                     
@@ -846,7 +844,7 @@ switchDisplayable (null, getListProductos ());//GEN-BEGIN:|7-commandAction|12|13
     } else if (command == okCommand17) {//GEN-LINE:|7-commandAction|13|1344-preAction
  // write pre-action user code here
         
-switchDisplayable(null, getFormProd());//GEN-LINE:|7-commandAction|14|1344-postAction
+        switchDisplayable(null, getFormProd());//GEN-LINE:|7-commandAction|14|1344-postAction
  if(swalert)
  {
        listProductos.append(productoTemporal.getKey()+" "+productoTemporal.getNotes()+"-"+productoTemporal.getUnits()+" cant.:"+productoTemporal.getQty(),null);
@@ -953,7 +951,8 @@ switchDisplayable(null, getListProductos());//GEN-LINE:|7-commandAction|38|1330-
         {
             
         /*    
-switchDisplayable(null, getFormCant());//GEN-LINE:|7-commandAction|40|1328-postAction
+switchDisplayable (null, getFormCant ());//GEN-BEGIN:|7-commandAction|40|1328-postAction
+//GEN-END:|7-commandAction|40|1328-postAction
           */
             switchDisplayable(null, getFormCantidad()); 
             formCant.setTitle(nombreProducto());
@@ -4648,6 +4647,7 @@ public Form getFormCantidad() {
         return formCant;
     }
 //<editor-fold defaultstate="collapsed" desc=" Generated Getter: okCommand17 ">//GEN-BEGIN:|1343-getter|0|1343-preInit
+
     /**
      * Returns an initialized instance of okCommand17 component.
      *
@@ -5847,9 +5847,6 @@ public TextField getTextNativo()
             case GUARDARFACTURA:
                 switchDisplayable(null, getFormFactura());
                 break;    
-            case CANTPROD:
-                switchDisplayable(null,getFormCant());
-                break;
             case REGISTRARCLIENTE:
                 if(estaRegistrado)
                 {
@@ -5950,9 +5947,7 @@ public TextField getTextNativo()
                 }
               
               break; 
-          case CANTPROD:
-                titulo= "Casilla de Texto Vacia";
-              break;
+        
           case REGISTRARCLIENTE:
                     if(estaRegistrado)
                     {
@@ -6057,9 +6052,7 @@ public TextField getTextNativo()
                 
                 
                 break;
-            case CANTPROD:
-                 mensaje="Por favor ingrese la cantidad del producto";
-                 break;
+                
             case REGISTRARCLIENTE:
                     if(estaRegistrado)
                     {
@@ -6474,9 +6467,9 @@ public TextField getTextNativo()
                             {
                                                                 
                                  switchDisplayable(null,getFormCant());
-//                               RetornarAlerta();
-                                productoTemporal = (Products) listaProductos.elementAt(punteroModificar);
-            //                   seleccionarProducto(pro,false);
+
+                                 productoTemporal = (Products) listaProductos.elementAt(punteroModificar);
+            
                                  listaProductos.removeElementAt(punteroModificar);
 
                                  listProductos.delete(punteroModificar);

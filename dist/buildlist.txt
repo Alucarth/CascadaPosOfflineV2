@@ -134,3 +134,13 @@ Generic/AnyPhone_320x240	es_BO	CascadaOfflinePOS.jar	CascadaOfflinePOS.jad	-	320
 
 Generic/AnyPhone_320x240	es_BO	CascadaOfflinePOS.jar	CascadaOfflinePOS.jad	-	320x240xnull
 
+Generic/AnyPhone_320x240	es_419	CascadaOfflinePOS.jar	CascadaOfflinePOS.jad	-	320x240xnull
+
+Generic/AnyPhone_320x240	es_419	CascadaOfflinePOS.jar	CascadaOfflinePOS.jad	-	320x240xnull
+
+Generic/AnyPhone_320x240	es_419	CascadaOfflinePOS.jar	CascadaOfflinePOS.jad	-	320x240xnull
+
+Generic/AnyPhone_320x240	es_419	CascadaOfflinePOS.jar	CascadaOfflinePOS.jad	-	320x240xnull
+
+Generic/AnyPhone_320x240	es_419	CascadaOfflinePOS.jar	CascadaOfflinePOS.jad	-	320x240xnull
+
